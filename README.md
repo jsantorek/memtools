@@ -53,17 +53,22 @@ using EOp = memtools::EOperation;
 constexpr memtools::Pattern PatternExample(
 	"41 B8 ? ? ? ? "    /* Wildcards contain an irrelevant integer value, that changes often. */
 	"48 8D 15 ? ? ? ? " /* Wildcards reference string "CEventHandler" */
-	"48 8D 0D ? ? ? ? " /* wildcards reference string "pHandler == null" */
+	"48 8D 0D ? ? ? ? " /* Wildcards reference string "pHandler == null" */
 	"E8 ? ? ? ?"        /* Function call to a sub function, we actually want a pointer to. */
 );
 const memtools::DataScan ExampleScan(
 	PatternExample,
 	{
-		{ EOp::offset, 9 },                  /* Advance 9 bytes, to the second set of wildcards. */
-		{ EOp::strcmp, "CEventHandler" },    /* Compare against the expected string. */
-		{ EOp::offset, 7 },                  /* Advance another 7 bytes, to the third set of wildcards. */
-		{ EOp::strcmp, "pHandler == null" }, /* Compare against the expected string. */
-		{ EOp::follow, 5 }                   /* Advances 5 bytes to the third set of wildcards, then follows the relative address. */
+		/* Advance 9 bytes, to the second set of wildcards. */
+		{ EOp::offset, 9 },
+		/* Compare against the expected string. */
+		{ EOp::strcmp, "CEventHandler" },
+		/* Advance another 7 bytes, to the third set of wildcards. */
+		{ EOp::offset, 7 },
+		/* Compare against the expected string. */
+		{ EOp::strcmp, "pHandler == null" },
+		/* Advances 5 bytes to the third set of wildcards, then follows the relative address. */
+		{ EOp::follow, 5 }
 	}
 );
 
