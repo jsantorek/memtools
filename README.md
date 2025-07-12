@@ -1,2 +1,2 @@
 # memtools
-C++ Memory Tools for pattern scanning, verification and navigation.
+x64 C++ Memory Tools for pattern scanning, verification and navigation.
