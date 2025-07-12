@@ -17,7 +17,7 @@
 #include <string>
 #include <vector>
 
-#define MAX_PATTERN_LENGTH 16
+#define MAX_PATTERN_LENGTH 128
 #define CHAR_0             0x30 /* ascii value for '0' */
 #define CHAR_9             0x39 /* ascii value for '9' */
 #define CHAR_A             0x41 /* ascii value for 'A' */
