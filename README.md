@@ -72,5 +72,10 @@ void main()
 	void* subfunc = ExampleScan.Scan();
 
 	/* If the bytes matched and all actions are successful the returned pointer should be in the function called at E8 ? ? ? ?. */
+
+	if (!subfunc)
+	{
+		/* Unsuccessful scan. No address returned. */
+	}
 }
 ```
