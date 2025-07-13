@@ -455,6 +455,64 @@ namespace memtools
 			return resultAddr;
 		}
 	};
+
+	///----------------------------------------------------------------------------------------------------
+	/// Patch Struct
+	///----------------------------------------------------------------------------------------------------
+	struct Patch
+	{
+		void*    Target        = nullptr;
+		uint8_t* OriginalBytes = nullptr;
+		uint64_t Size          = 0;
+
+		///----------------------------------------------------------------------------------------------------
+		/// ctor
+		///----------------------------------------------------------------------------------------------------
+		inline Patch(void* aTarget, uint8_t* aBytes, uint64_t aSize)
+		{
+			if (aTarget == nullptr) { throw "Target is nullptr."; }
+			if (aBytes == nullptr)  { throw "Patch Bytes are nullptr."; }
+			if (aSize == 0)         { throw "Patch Bytes are size 0."; }
+
+			this->Target = aTarget;
+			this->Size = aSize;
+
+			DWORD oldProtect;
+			if (VirtualProtect(aTarget, aSize, PAGE_EXECUTE_READWRITE, &oldProtect))
+			{
+				/* Allocate buffer to hold the original bytes. */
+				this->OriginalBytes = new uint8_t[aSize];
+
+				/* Copy the original bytes. */
+				memcpy(this->OriginalBytes, aTarget, aSize);
+
+				/* Write the new bytes. */
+				memcpy(aTarget, aBytes, aSize);
+
+				/* Restore page protection. */
+				VirtualProtect(aTarget, aSize, oldProtect, &oldProtect);
+			}
+		}
+
+		///----------------------------------------------------------------------------------------------------
+		/// dtor
+		///----------------------------------------------------------------------------------------------------
+		inline ~Patch()
+		{
+			DWORD oldProtect;
+			if (VirtualProtect(this->Target, this->Size, PAGE_EXECUTE_READWRITE, &oldProtect))
+			{
+				/* Restore original bytes. */
+				memcpy(this->Target, this->OriginalBytes, this->Size);
+
+				/* Restore page protection. */
+				VirtualProtect(this->Target, this->Size, oldProtect, &oldProtect);
+			}
+
+			/* Delete the allocated buffer. */
+			delete this->OriginalBytes;
+		}
+	};
 }
 
 #endif
