@@ -511,6 +511,7 @@ namespace memtools
 				this->Scans.push_back(scan);
 			}
 		}
+
 		///----------------------------------------------------------------------------------------------------
 		/// Scan:
 		/// 	Performs the datascans sequentially, returning if one succeeds. Otherwise returns nullptr.
