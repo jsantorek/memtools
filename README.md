@@ -23,7 +23,7 @@ Invalid:
 - `1a 2b 3c 4d` - Lowercase is not permitted.
 - `1A2B3C4D` - Will be interpreted in pairs as `1A 2B 3C 4D`.
 - `1A2B3C4` - Will be interpreted in pairs as `1A 2B 3C 04`.
-- `1A 2B ??? 5E` - Will be interpreted as `1A 2B ? ? 5E`. Third and fourth byte won't be matched.
+- `1A 2B ??? 5E` - Will be interpreted as `1A 2B ?? ? 5E`. Third and fourth byte won't be matched.
 
 ## Instructions
 In addition to matching against memory patterns, you can navigate and validate around this pattern. For example, you can match against a string to confirm the address is correct.
