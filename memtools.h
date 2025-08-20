@@ -628,29 +628,30 @@ namespace memtools
 		///----------------------------------------------------------------------------------------------------
 		/// ctor
 		///----------------------------------------------------------------------------------------------------
-		inline Patch(void* aTarget, uint8_t* aBytes, uint64_t aSize)
+		inline Patch(void* aTarget, const char* aBytes)
 		{
 			if (aTarget == nullptr) { throw "Target is nullptr."; }
 			if (aBytes == nullptr)  { throw "Patch Bytes are nullptr."; }
-			if (aSize == 0)         { throw "Patch Bytes are size 0."; }
 
 			this->Target = aTarget;
-			this->Size = aSize;
+			this->Size = strlen(aBytes);
+
+			if (this->Size == 0) { throw "Patch Bytes are size 0."; }
 
 			DWORD oldProtect;
-			if (VirtualProtect(aTarget, aSize, PAGE_EXECUTE_READWRITE, &oldProtect))
+			if (VirtualProtect(aTarget, this->Size, PAGE_EXECUTE_READWRITE, &oldProtect))
 			{
 				/* Allocate buffer to hold the original bytes. */
-				this->OriginalBytes = new uint8_t[aSize];
+				this->OriginalBytes = new uint8_t[this->Size];
 
 				/* Copy the original bytes. */
-				memcpy(this->OriginalBytes, aTarget, aSize);
+				memcpy(this->OriginalBytes, aTarget, this->Size);
 
 				/* Write the new bytes. */
-				memcpy(aTarget, aBytes, aSize);
+				memcpy(aTarget, aBytes, this->Size);
 
 				/* Restore page protection. */
-				VirtualProtect(aTarget, aSize, oldProtect, &oldProtect);
+				VirtualProtect(aTarget, this->Size, oldProtect, &oldProtect);
 			}
 		}
 

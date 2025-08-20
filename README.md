@@ -96,9 +96,9 @@ void main()
 A patch utility also exists. Its purpose is to create a runtime patch at a given address, which can later be deleted.
 
 ### Usage
-`Patch(void* aTarget, uint8_t* aBytes, uint64_t aSize);`
+`Patch(void* aTarget, uint8_t* aBytes);`
 ```cpp
-memtools::Patch* someBytePatch = new Patch(...);
+memtools::Patch* someBytePatch = new Patch(targetAddr, "\xC8");
 
 ...
 
