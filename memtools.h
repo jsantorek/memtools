@@ -120,6 +120,10 @@ namespace memtools
 				/* Skip spaces. */
 				if (aPattern[i] == ' ') { continue; }
 
+				/* Skip angle brackets. (For marking significant bytes.)*/
+				if (aPattern[i] == '<') { continue; }
+				if (aPattern[i] == '>') { continue; }
+
 				/* Match wildcard. */
 				if (aPattern[i] == '?')
 				{
