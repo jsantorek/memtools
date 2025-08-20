@@ -384,14 +384,11 @@ namespace memtools
 		///----------------------------------------------------------------------------------------------------
 		/// ctor
 		///----------------------------------------------------------------------------------------------------
-		inline DataScan(const Pattern aASM, std::initializer_list<Instruction> aInstructions = {})
+		template<typename... Instrs>
+		inline DataScan(Pattern aASM, Instrs&&... instrs) : Assembly(aASM)
 		{
-			this->Assembly = aASM;
-
-			for (const Instruction& instr : aInstructions)
-			{
-				this->Instructions.push_back(instr);
-			}
+			// Perfectly forward all instructions into the vector
+			(Instructions.push_back(std::forward<Instrs>(instrs)), ...);
 		}
 
 		///----------------------------------------------------------------------------------------------------

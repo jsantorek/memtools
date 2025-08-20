@@ -55,20 +55,24 @@ constexpr memtools::Pattern PatternExample(
 );
 const memtools::DataScan ExampleScan(
 	PatternExample,
-	{
-		/* Advance 9 bytes, to the second set of wildcards. */
-		memtools::Offset(9),
-		/* Compare against the expected string. */
-		memtools::Strcmp("CEventHandler"),
-		/* Advance another 7 bytes, to the third set of wildcards. */
-		memtools::Offset(7),
-		/* Compare against the expected string. */
-		memtools::Strcmp("pHandler == null)",
-		/* Advances 5 bytes to the third set of wildcards. */
-		memtools::Offset(5),
-		/* Follows the relative address into the function. */
-		memtools::Follow()
-	}
+
+	/* Advance 9 bytes, to the second set of wildcards. */
+	memtools::Offset(9),
+
+	/* Compare against the expected string. */
+	memtools::Strcmp("CEventHandler"),
+
+	/* Advance another 7 bytes, to the third set of wildcards. */
+	memtools::Offset(7),
+
+	/* Compare against the expected string. */
+	memtools::Strcmp("pHandler == null)",
+
+	/* Advances 5 bytes to the third set of wildcards. */
+	memtools::Offset(5),
+
+	/* Follows the relative address into the function. */
+	memtools::Follow()
 );
 
 void main()
