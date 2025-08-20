@@ -478,7 +478,7 @@ namespace memtools
 								}
 								case EOperation::follow:
 								{
-									resultAddr = FollowRelativeAddress((PBYTE)resultAddr + inst.Value);
+									resultAddr = FollowRelativeAddress((PBYTE)resultAddr);
 									break;
 								}
 								case EOperation::strcmp:
