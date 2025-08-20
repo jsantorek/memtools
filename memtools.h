@@ -248,9 +248,6 @@ namespace memtools
 		};
 
 		Instruction() : Operation(EOperation::NONE), Value(0) {}
-		Instruction(EOperation aOp, int64_t aValue) : Operation(aOp), Value(aValue) {}
-		Instruction(EOperation aOp, std::string aStr) : Operation(aOp), String(aStr) {}
-		Instruction(EOperation aOp, std::wstring aWStr) : Operation(aOp), WString(aWStr) {}
 
 		inline ~Instruction()
 		{
@@ -319,6 +316,93 @@ namespace memtools
 			}
 
 			return *this;
+		}
+	};
+
+	struct Offset : Instruction
+	{
+		inline Offset(int64_t aValue)
+		{
+			this->Operation = EOperation::offset;
+			this->Value = aValue;
+		}
+	};
+
+	struct Follow : Instruction
+	{
+		inline Follow()
+		{
+			this->Operation = EOperation::follow;
+		}
+	};
+
+	struct Strcmp : Instruction
+	{
+		inline Strcmp(std::string aStr)
+		{
+			this->Operation = EOperation::strcmp;
+			new (&this->String) std::string(aStr);
+		}
+	};
+
+	struct Wcscmp : Instruction
+	{
+		inline Wcscmp(std::wstring aWStr)
+		{
+			this->Operation = EOperation::wcscmp;
+			new (&this->WString) std::wstring(aWStr);
+		}
+	};
+
+	struct CmpI8 : Instruction
+	{
+		inline CmpI8(int64_t aValue)
+		{
+			this->Operation = EOperation::cmpi8;
+			this->Value = aValue;
+		}
+	};
+
+	struct CmpI16 : Instruction
+	{
+		inline CmpI16(int64_t aValue)
+		{
+			this->Operation = EOperation::cmpi16;
+			this->Value = aValue;
+		}
+	};
+
+	struct CmpI32 : Instruction
+	{
+		inline CmpI32(int64_t aValue)
+		{
+			this->Operation = EOperation::cmpi32;
+			this->Value = aValue;
+		}
+	};
+
+	struct CmpI64 : Instruction
+	{
+		inline CmpI64(int64_t aValue)
+		{
+			this->Operation = EOperation::cmpi64;
+			this->Value = aValue;
+		}
+	};
+
+	struct PushAddr : Instruction
+	{
+		inline PushAddr()
+		{
+			this->Operation = EOperation::pushaddr;
+		}
+	};
+
+	struct PopAddr : Instruction
+	{
+		inline PopAddr()
+		{
+			this->Operation = EOperation::popaddr;
 		}
 	};
 

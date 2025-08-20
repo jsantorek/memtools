@@ -32,23 +32,20 @@ If any instructions fail, the scanner will continue to scan to the next byte seq
 Only if the pattern matches and all instructions are successful the address will be returned.
 
 ### Operations
-- `offset` - Adds an offset to the current address.
-- `follow` - Follows a relative address.
-- `strcmp` - Compares against an UTF8 string.
-- `wcscmp` - Compares against an UTF16 string.
-- `cmpi8` - Compares against an 8 bit integer.
-- `cmpi16` - Compares against a 16 bit integer.
-- `cmpi32` - Compares against a 32 bit integer.
-- `cmpi64` - Compares against a 64 bit integer.
-- `pushaddr` - Stores the current address, to return to it. E.g. to check a string in a sub function and then continue navigating the callsite.
-- `popaddr` - Restores the last pushed address and continues from there.
+- `Offset` - Adds an offset to the current address.
+- `Follow` - Follows a relative address.
+- `Strcmp` - Compares against an UTF8 string.
+- `Wcscmp` - Compares against an UTF16 string.
+- `CmpI8` - Compares against an 8 bit integer.
+- `CmpI16` - Compares against a 16 bit integer.
+- `CmpI32` - Compares against a 32 bit integer.
+- `CmpI64` - Compares against a 64 bit integer.
+- `PushAddr` - Stores the current address, to return to it. E.g. to check a string in a sub function and then continue navigating the callsite.
+- `PopAddr` - Restores the last pushed address and continues from there.
 
 ## Examples
 
 ```cpp
-/* Shorter instructions. */
-using EOp = memtools::EOperation;
-
 /* Byte pattern to search for with wildcards. */
 constexpr memtools::Pattern PatternExample(
 	"41 B8 ? ? ? ? "    /* Wildcards contain an irrelevant integer value, that changes often. */
@@ -60,15 +57,17 @@ const memtools::DataScan ExampleScan(
 	PatternExample,
 	{
 		/* Advance 9 bytes, to the second set of wildcards. */
-		{ EOp::offset, 9 },
+		memtools::Offset(9),
 		/* Compare against the expected string. */
-		{ EOp::strcmp, "CEventHandler" },
+		memtools::Strcmp("CEventHandler"),
 		/* Advance another 7 bytes, to the third set of wildcards. */
-		{ EOp::offset, 7 },
+		memtools::Offset(7),
 		/* Compare against the expected string. */
-		{ EOp::strcmp, "pHandler == null" },
-		/* Advances 5 bytes to the third set of wildcards, then follows the relative address. */
-		{ EOp::follow, 5 }
+		memtools::Strcmp("pHandler == null)",
+		/* Advances 5 bytes to the third set of wildcards. */
+		memtools::Offset(5),
+		/* Follows the relative address into the function. */
+		memtools::Follow()
 	}
 );
 
@@ -82,5 +81,27 @@ void main()
 	{
 		/* Unsuccessful scan. No address returned. */
 	}
+
+	/* You can also create a "FallbackScan", which combines multiple DataScans. */
+	memtools::FallbackScan fallback(
+		ExampleScan,
+		AnotherScan
+	);
+
+	subfunc = fallback.Scan();
 }
+```
+
+## Patch
+A patch utility also exists. Its purpose is to create a runtime patch at a given address, which can later be deleted.
+
+### Usage
+`Patch(void* aTarget, uint8_t* aBytes, uint64_t aSize);`
+```cpp
+memtools::Patch* someBytePatch = new Patch(...);
+
+...
+
+/* Removes the patched bytes and restores them to the original. */
+delete someBytePatch;
 ```
