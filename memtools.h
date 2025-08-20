@@ -247,7 +247,11 @@ namespace memtools
 			std::wstring WString;
 		};
 
-		Instruction() : Operation(EOperation::NONE), Value(0) {}
+		Instruction()                                    : Operation(EOperation::NONE), Value(0)       {}
+		Instruction(EOperation aOp)                      : Operation(aOp),              Value(0)       {}
+		Instruction(EOperation aOp, int64_t      aValue) : Operation(aOp),              Value(aValue)  {}
+		Instruction(EOperation aOp, std::string  aStr)   : Operation(aOp),              String(aStr)   {}
+		Instruction(EOperation aOp, std::wstring aWStr)  : Operation(aOp),              WString(aWStr) {}
 
 		inline ~Instruction()
 		{
@@ -321,89 +325,52 @@ namespace memtools
 
 	struct Offset : Instruction
 	{
-		inline Offset(int64_t aValue)
-		{
-			this->Operation = EOperation::offset;
-			this->Value = aValue;
-		}
+		inline Offset(int64_t aValue) : Instruction(EOperation::offset, aValue) {}
 	};
 
 	struct Follow : Instruction
 	{
-		inline Follow()
-		{
-			this->Operation = EOperation::follow;
-		}
+		inline Follow() : Instruction(EOperation::follow) {}
 	};
 
 	struct Strcmp : Instruction
 	{
-		inline Strcmp(std::string aStr)
-		{
-			this->Operation = EOperation::strcmp;
-			new (&this->String) std::string(aStr);
-		}
+		inline Strcmp(std::string aStr) : Instruction(EOperation::strcmp, aStr) {}
 	};
 
 	struct Wcscmp : Instruction
 	{
-		inline Wcscmp(std::wstring aWStr)
-		{
-			this->Operation = EOperation::wcscmp;
-			new (&this->WString) std::wstring(aWStr);
-		}
+		inline Wcscmp(std::wstring aWStr) : Instruction(EOperation::wcscmp, aWStr) {}
 	};
 
 	struct CmpI8 : Instruction
 	{
-		inline CmpI8(int64_t aValue)
-		{
-			this->Operation = EOperation::cmpi8;
-			this->Value = aValue;
-		}
+		inline CmpI8(int64_t aValue) : Instruction(EOperation::cmpi8, aValue) {}
 	};
 
 	struct CmpI16 : Instruction
 	{
-		inline CmpI16(int64_t aValue)
-		{
-			this->Operation = EOperation::cmpi16;
-			this->Value = aValue;
-		}
+		inline CmpI16(int64_t aValue) : Instruction(EOperation::cmpi16, aValue) {}
 	};
 
 	struct CmpI32 : Instruction
 	{
-		inline CmpI32(int64_t aValue)
-		{
-			this->Operation = EOperation::cmpi32;
-			this->Value = aValue;
-		}
+		inline CmpI32(int64_t aValue) : Instruction(EOperation::cmpi32, aValue) {}
 	};
 
 	struct CmpI64 : Instruction
 	{
-		inline CmpI64(int64_t aValue)
-		{
-			this->Operation = EOperation::cmpi64;
-			this->Value = aValue;
-		}
+		inline CmpI64(int64_t aValue) : Instruction(EOperation::cmpi64, aValue) {}
 	};
 
 	struct PushAddr : Instruction
 	{
-		inline PushAddr()
-		{
-			this->Operation = EOperation::pushaddr;
-		}
+		inline PushAddr() : Instruction(EOperation::pushaddr) {}
 	};
 
 	struct PopAddr : Instruction
 	{
-		inline PopAddr()
-		{
-			this->Operation = EOperation::popaddr;
-		}
+		inline PopAddr() : Instruction(EOperation::popaddr) {}
 	};
 
 	///----------------------------------------------------------------------------------------------------
