@@ -328,56 +328,100 @@ namespace memtools
 		}
 	};
 
+	///----------------------------------------------------------------------------------------------------
+	/// Offset:
+	/// 	Adds an offset (in bytes) to the current memory address.
+	///----------------------------------------------------------------------------------------------------
 	struct Offset : Instruction
 	{
 		inline Offset(int64_t aValue) : Instruction(EOperation::offset, aValue) {}
 	};
 
+	///----------------------------------------------------------------------------------------------------
+	/// Follow:
+	/// 	Interprets the current address as a relative address and follows it.
+	///----------------------------------------------------------------------------------------------------
 	struct Follow : Instruction
 	{
 		inline Follow() : Instruction(EOperation::follow) {}
 	};
 
+	///----------------------------------------------------------------------------------------------------
+	/// Strcmp:
+	/// 	Interprets the current address as a relative address to a string, follows and compares it.
+	///----------------------------------------------------------------------------------------------------
 	struct Strcmp : Instruction
 	{
 		inline Strcmp(std::string aStr) : Instruction(EOperation::strcmp, aStr) {}
 	};
 
+	///----------------------------------------------------------------------------------------------------
+	/// Wcscmp:
+	/// 	Interprets the current address as a relative address to a wstring, follows and compares it.
+	///----------------------------------------------------------------------------------------------------
 	struct Wcscmp : Instruction
 	{
 		inline Wcscmp(std::wstring aWStr) : Instruction(EOperation::wcscmp, aWStr) {}
 	};
 
+	///----------------------------------------------------------------------------------------------------
+	/// CmpI8:
+	/// 	Interprets the current address as an i8 compares it.
+	///----------------------------------------------------------------------------------------------------
 	struct CmpI8 : Instruction
 	{
 		inline CmpI8(int64_t aValue) : Instruction(EOperation::cmpi8, aValue) {}
 	};
 
+	///----------------------------------------------------------------------------------------------------
+	/// CmpI16:
+	/// 	Interprets the current address as an i16 compares it.
+	///----------------------------------------------------------------------------------------------------
 	struct CmpI16 : Instruction
 	{
 		inline CmpI16(int64_t aValue) : Instruction(EOperation::cmpi16, aValue) {}
 	};
 
+	///----------------------------------------------------------------------------------------------------
+	/// CmpI32:
+	/// 	Interprets the current address as an i32 compares it.
+	///----------------------------------------------------------------------------------------------------
 	struct CmpI32 : Instruction
 	{
 		inline CmpI32(int64_t aValue) : Instruction(EOperation::cmpi32, aValue) {}
 	};
 
+	///----------------------------------------------------------------------------------------------------
+	/// CmpI64:
+	/// 	Interprets the current address as an i64 compares it.
+	///----------------------------------------------------------------------------------------------------
 	struct CmpI64 : Instruction
 	{
 		inline CmpI64(int64_t aValue) : Instruction(EOperation::cmpi64, aValue) {}
 	};
 
+	///----------------------------------------------------------------------------------------------------
+	/// PushAddr:
+	/// 	Stores the current address on the address stack.
+	///----------------------------------------------------------------------------------------------------
 	struct PushAddr : Instruction
 	{
 		inline PushAddr() : Instruction(EOperation::pushaddr) {}
 	};
 
+	///----------------------------------------------------------------------------------------------------
+	/// PopAddr:
+	/// 	Restores the last address on the address stack and removes it.
+	///----------------------------------------------------------------------------------------------------
 	struct PopAddr : Instruction
 	{
 		inline PopAddr() : Instruction(EOperation::popaddr) {}
 	};
 
+	///----------------------------------------------------------------------------------------------------
+	/// AdvWcard:
+	/// 	Adds an offset to the current offset, so that the address will be at the next set of wildcards.
+	///----------------------------------------------------------------------------------------------------
 	struct AdvWcard : Instruction
 	{
 		inline AdvWcard() : Instruction(EOperation::advwcard) {}
