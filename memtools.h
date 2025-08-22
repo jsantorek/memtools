@@ -235,7 +235,8 @@ namespace memtools
 		cmpi32,
 		cmpi64,
 		pushaddr,
-		popaddr
+		popaddr,
+		advwcard
 	};
 
 	///----------------------------------------------------------------------------------------------------
@@ -377,6 +378,11 @@ namespace memtools
 		inline PopAddr() : Instruction(EOperation::popaddr) {}
 	};
 
+	struct AdvWcard : Instruction
+	{
+		inline AdvWcard() : Instruction(EOperation::advwcard) {}
+	};
+
 	///----------------------------------------------------------------------------------------------------
 	/// DataScan Struct
 	///----------------------------------------------------------------------------------------------------
@@ -466,6 +472,9 @@ namespace memtools
 
 						std::vector<void*> addrStore{};
 
+						/* Track offsets for wildcard advancing. */
+						int64_t offsetFromMatch = 0;
+
 						for (const Instruction& inst : this->Instructions)
 						{
 							EOperation op = inst.Operation;
@@ -474,6 +483,7 @@ namespace memtools
 							{
 								case EOperation::offset:
 								{
+									offsetFromMatch += inst.Value;
 									resultAddr = (PBYTE)resultAddr + inst.Value;
 									break;
 								}
@@ -521,6 +531,31 @@ namespace memtools
 								{
 									resultAddr = addrStore.back();
 									addrStore.pop_back();
+									break;
+								}
+								case EOperation::advwcard:
+								{
+									bool wasAtWildcard = this->Assembly.Bytes[offsetFromMatch].IsWildcard;
+									bool foundWildcard = false;
+
+									while (offsetFromMatch < (int64_t)this->Assembly.Size)
+									{
+										if (wasAtWildcard && this->Assembly.Bytes[offsetFromMatch].IsWildcard)
+										{
+											offsetFromMatch++;
+										}
+										else if (!wasAtWildcard && this->Assembly.Bytes[offsetFromMatch].IsWildcard)
+										{
+											resultAddr = base + i + offsetFromMatch;
+											break;
+										}
+										else
+										{
+											offsetFromMatch++;
+											wasAtWildcard = false;
+										}
+									}
+
 									break;
 								}
 							}
