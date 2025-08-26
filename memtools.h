@@ -272,6 +272,8 @@ namespace memtools
 					this->WString.~basic_string();
 					break;
 				}
+				default:
+					break;
 			}
 		}
 
@@ -602,6 +604,8 @@ namespace memtools
 
 									break;
 								}
+								default:
+									break;
 							}
 
 							if (instructionsFailed)
