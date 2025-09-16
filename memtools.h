@@ -228,6 +228,7 @@ namespace memtools
 		NONE,
 		offset,
 		follow,
+		followAbs,
 		strcmp,
 		wcscmp,
 		cmpi8,
@@ -346,6 +347,15 @@ namespace memtools
 	struct Follow : Instruction
 	{
 		inline Follow() : Instruction(EOperation::follow) {}
+	};
+
+	///----------------------------------------------------------------------------------------------------
+	/// FollowAbs:
+	/// 	Interprets the current address as an absolute address and follows it.
+	///----------------------------------------------------------------------------------------------------
+	struct FollowAbs : Instruction
+	{
+		inline FollowAbs() : Instruction(EOperation::followAbs) {}
 	};
 
 	///----------------------------------------------------------------------------------------------------
@@ -536,6 +546,11 @@ namespace memtools
 								case EOperation::follow:
 								{
 									resultAddr = FollowRelativeAddress((PBYTE)resultAddr);
+									break;
+								}
+								case EOperation::followAbs:
+								{
+									resultAddr = *(PBYTE*)resultAddr;
 									break;
 								}
 								case EOperation::strcmp:
