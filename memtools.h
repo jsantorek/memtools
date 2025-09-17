@@ -236,7 +236,8 @@ namespace memtools
 		cmpi64,
 		pushaddr,
 		popaddr,
-		advwcard
+		advwcard,
+		gofnptr
 	};
 
 	///----------------------------------------------------------------------------------------------------
@@ -273,7 +274,9 @@ namespace memtools
 					break;
 				}
 				default:
+				{
 					break;
+				}
 			}
 		}
 
@@ -427,6 +430,15 @@ namespace memtools
 	struct AdvWcard : Instruction
 	{
 		inline AdvWcard() : Instruction(EOperation::advwcard) {}
+	};
+
+	///----------------------------------------------------------------------------------------------------
+	/// GoFnPtr:
+	/// 	Decrements the current address until a 0xCC byte is hit.
+	///----------------------------------------------------------------------------------------------------
+	struct GoFnPtr : Instruction
+	{
+		inline GoFnPtr() : Instruction(EOperation::gofnptr) {}
 	};
 
 	///----------------------------------------------------------------------------------------------------
@@ -604,8 +616,20 @@ namespace memtools
 
 									break;
 								}
-								default:
+								case EOperation::gofnptr:
+								{
+									while (((PBYTE)resultAddr)[0] != 0xCC)
+									{
+										resultAddr = (PBYTE)resultAddr - 1;
+									}
+
+									resultAddr = (PBYTE)resultAddr + 1;
 									break;
+								}
+								default:
+								{
+									break;
+								}
 							}
 
 							if (instructionsFailed)
