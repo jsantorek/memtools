@@ -280,7 +280,9 @@ namespace memtools
 					break;
 				}
 				default:
+				{
 					break;
+				}
 			}
 		}
 
@@ -485,7 +487,7 @@ namespace memtools
 					return match.Pattern == this->Assembly;
 				});
 
-				/* If stored, start from stort address. */
+				/* If stored, start from stored address. */
 				if (it != s_PatternMatchStore.end())
 				{
 					addr = (PBYTE)it->Address;
