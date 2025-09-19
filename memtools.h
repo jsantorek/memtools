@@ -460,7 +460,8 @@ namespace memtools
 		/// Scan:
 		/// 	Scans for the memory pattern and returns its pointer if found.
 		///----------------------------------------------------------------------------------------------------
-		inline void* Scan() const
+		template <typename T = void*>
+		inline T Scan() const
 		{
 			if (this->Assembly.Size == 0) { return nullptr; }
 
@@ -675,7 +676,7 @@ namespace memtools
 				}
 			}
 
-			return resultAddr;
+			return (T)resultAddr;
 		}
 	};
 
@@ -701,7 +702,8 @@ namespace memtools
 		/// Scan:
 		/// 	Performs the datascans sequentially, returning if one succeeds. Otherwise returns nullptr.
 		///----------------------------------------------------------------------------------------------------
-		inline void* Scan() const
+		template <typename T = void*>
+		inline T Scan() const
 		{
 			for (const DataScan& scan : this->Scans)
 			{
@@ -709,11 +711,11 @@ namespace memtools
 
 				if (result)
 				{
-					return result;
+					return (T)result;
 				}
 			}
 
-			return nullptr;
+			return (T)nullptr;
 		}
 	};
 
