@@ -17,6 +17,13 @@
 #include <string>
 #include <vector>
 
+/// You can define ENABLE_PATTERN_CACHING which will store the first result matching a given pattern.
+/// This potentially speeds up multiple searches starting with the same pattern.
+//#define ENABLE_PATTERN_CACHING
+#ifdef ENABLE_PATTERN_CACHING
+#include <mutex>
+#endif
+
 #define MAX_PATTERN_LENGTH 128
 #define CHAR_0             0x30 /* ascii value for '0' */
 #define CHAR_9             0x39 /* ascii value for '9' */
@@ -461,6 +468,31 @@ namespace memtools
 			GetModuleInformation(GetCurrentProcess(), GetModuleHandle(NULL), &modInfo, sizeof(modInfo));
 			PBYTE addr = (PBYTE)modInfo.lpBaseOfDll;
 
+#ifdef ENABLE_PATTERN_CACHING
+			struct PatternMatch
+			{
+				memtools::Pattern Pattern;
+				void*             Address;
+			};
+
+			static std::mutex                s_PatternMatchMutex;
+			static std::vector<PatternMatch> s_PatternMatchStore;
+
+			{
+				const std::lock_guard<std::mutex> lock(s_PatternMatchMutex);
+				auto it = std::find_if(s_PatternMatchStore.begin(), s_PatternMatchStore.end(), [this](const PatternMatch& match)
+				{
+					return match.Pattern == this->Assembly;
+				});
+
+				/* If stored, start from stort address. */
+				if (it != s_PatternMatchStore.end())
+				{
+					addr = (PBYTE)it->Address;
+				}
+			}
+#endif
+
 			MEMORY_BASIC_INFORMATION mbi{};
 
 			while (resultAddr == nullptr)
@@ -512,6 +544,22 @@ namespace memtools
 
 					if (isMatch)
 					{
+#ifdef ENABLE_PATTERN_CACHING
+						{
+							const std::lock_guard<std::mutex> lock(s_PatternMatchMutex);
+							auto it = std::find_if(s_PatternMatchStore.begin(), s_PatternMatchStore.end(), [this](const PatternMatch& match)
+							{
+								return match.Pattern == this->Assembly;
+							});
+
+							/* If stored, start from stort address. */
+							if (it == s_PatternMatchStore.end())
+							{
+								s_PatternMatchStore.push_back(PatternMatch{ this->Assembly, base + i });
+							}
+						}
+#endif
+
 						resultAddr = base + i;
 
 						uint32_t instructionsFailed = 0;
