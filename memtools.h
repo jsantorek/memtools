@@ -467,9 +467,7 @@ namespace memtools
 
 			void* resultAddr = nullptr;
 
-			MODULEINFO modInfo{};
-			GetModuleInformation(GetCurrentProcess(), GetModuleHandle(NULL), &modInfo, sizeof(modInfo));
-			PBYTE addr = (PBYTE)modInfo.lpBaseOfDll;
+			PBYTE addr = 0;
 
 #ifdef ENABLE_PATTERN_CACHING
 			struct PatternMatch
@@ -506,12 +504,6 @@ namespace memtools
 					break;
 				}
 
-				/* If address outside of module range, stop scanning. */
-				if (!(addr >= modInfo.lpBaseOfDll && addr <= (PBYTE)modInfo.lpBaseOfDll + modInfo.SizeOfImage))
-				{
-					break;
-				}
-
 				/* Advance query address into the next page. */
 				addr += mbi.RegionSize;
 
@@ -528,10 +520,7 @@ namespace memtools
 				}
 
 				/* Skip pages without read permission. */
-				if (!((mbi.Protect & PAGE_READONLY) == PAGE_READONLY ||
-					(mbi.Protect & PAGE_READWRITE) == PAGE_READWRITE ||
-					(mbi.Protect & PAGE_EXECUTE_READ) == PAGE_EXECUTE_READ ||
-					(mbi.Protect & PAGE_EXECUTE_READWRITE) == PAGE_EXECUTE_READWRITE))
+				if (!(mbi.Protect == PAGE_EXECUTE_READ || mbi.Protect == PAGE_EXECUTE_READWRITE))
 				{
 					continue;
 				}
