@@ -25,14 +25,20 @@
 #include <mutex>
 #endif
 
-#define MAX_PATTERN_LENGTH 128
-#define CHAR_0             0x30 /* ascii value for '0' */
-#define CHAR_9             0x39 /* ascii value for '9' */
-#define CHAR_A             0x41 /* ascii value for 'A' */
-#define CHAR_F             0x46 /* ascii value for 'F' */
-#define HEXVAL_A           10   /* value of hex A */
-#define HEXPOW_1           0x01 /* power of the first digit */
-#define HEXPOW_2           0x10 /* power of the second digit */
+#ifndef MAX_PATTERN_LENGTH
+#define MAX_PATTERN_LENGTH     128
+#endif
+
+#ifndef MAX_INSTRUCTION_LENGTH
+#define MAX_INSTRUCTION_LENGTH 16
+#endif
+#define CHAR_0                 0x30 /* ascii value for '0' */
+#define CHAR_9                 0x39 /* ascii value for '9' */
+#define CHAR_A                 0x41 /* ascii value for 'A' */
+#define CHAR_F                 0x46 /* ascii value for 'F' */
+#define HEXVAL_A               10   /* value of hex A */
+#define HEXPOW_1               0x01 /* power of the first digit */
+#define HEXPOW_2               0x10 /* power of the second digit */
 
 ///----------------------------------------------------------------------------------------------------
 /// memtools Namespace
@@ -373,17 +379,20 @@ namespace memtools
 	///----------------------------------------------------------------------------------------------------
 	struct DataScan
 	{
-		Pattern                  Assembly;
-		std::vector<Instruction> Instructions;
+		Pattern                                         Assembly;
+		std::array<Instruction, MAX_INSTRUCTION_LENGTH> Instructions = {};
+		std::size_t                                     Count        = 0;
 
 		///----------------------------------------------------------------------------------------------------
 		/// ctor
 		///----------------------------------------------------------------------------------------------------
 		template<typename... Instrs>
-		inline DataScan(Pattern aASM, Instrs&&... instrs) : Assembly(aASM)
+		constexpr DataScan(Pattern aASM, Instrs... instrs)
+			: Assembly(aASM)
+			, Instructions{ instrs... }
+			, Count(sizeof...(Instrs))
 		{
-			// Perfectly forward all instructions into the vector
-			(Instructions.push_back(std::forward<Instrs>(instrs)), ...);
+			static_assert(sizeof...(Instrs) <= MAX_INSTRUCTION_LENGTH, "Too many instructions for DataScan.");
 		}
 
 		///----------------------------------------------------------------------------------------------------
