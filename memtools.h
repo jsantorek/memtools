@@ -11,6 +11,7 @@
 
 #include <windows.h>
 
+#include <array>
 #include <cstdint>
 #include <initializer_list>
 #include <psapi.h>
@@ -251,70 +252,32 @@ namespace memtools
 	///----------------------------------------------------------------------------------------------------
 	struct Instruction
 	{
-		EOperation       Operation;
-		union
-		{
-			int64_t      Value;
-			std::string  String;
-			std::wstring WString;
-		};
+		EOperation     Operation;
+		int64_t        Value;
+		const char*    String;
+		const wchar_t* WString;
 
-		Instruction()                                    : Operation(EOperation::NONE), Value(0)       {}
-		Instruction(EOperation aOp)                      : Operation(aOp),              Value(0)       {}
-		Instruction(EOperation aOp, int64_t      aValue) : Operation(aOp),              Value(aValue)  {}
-		Instruction(EOperation aOp, std::string  aStr)   : Operation(aOp),              String(aStr)   {}
-		Instruction(EOperation aOp, std::wstring aWStr)  : Operation(aOp),              WString(aWStr) {}
+		constexpr Instruction()                                      : Operation(EOperation::NONE), Value(0),      String(nullptr), WString(nullptr) {}
+		constexpr Instruction(EOperation aOp)                        : Operation(aOp),              Value(0),      String(nullptr), WString(nullptr) {}
+		constexpr Instruction(EOperation aOp, int64_t        aValue) : Operation(aOp),              Value(aValue), String(nullptr), WString(nullptr) {}
+		constexpr Instruction(EOperation aOp, const char*    aStr)   : Operation(aOp),              Value(0),      String(aStr),    WString(nullptr) {}
+		constexpr Instruction(EOperation aOp, const wchar_t* aWStr)  : Operation(aOp),              Value(0),      String(nullptr), WString(aWStr) {}
 
-		inline ~Instruction()
-		{
-			switch (this->Operation)
-			{
-				case EOperation::strcmp:
-				{
-					this->String.~basic_string();
-					break;
-				}
-				case EOperation::wcscmp:
-				{
-					this->WString.~basic_string();
-					break;
-				}
-				default:
-				{
-					break;
-				}
-			}
-		}
-
-		inline Instruction(const Instruction& aOther)
-		{
-			this->Operation = aOther.Operation;
-
-			switch (this->Operation)
-			{
-				case EOperation::strcmp:
-				{
-					new (&this->String) std::string(aOther.String);
-					break;
-				}
-				case EOperation::wcscmp:
-				{
-					new (&this->WString) std::wstring(aOther.WString);
-					break;
-				}
-				default:
-				{
-					this->Value = aOther.Value;
-					break;
-				}
-			}
-		}
+		inline constexpr Instruction(const Instruction& aOther) 
+			: Operation(aOther.Operation)
+			, Value(aOther.Value)
+			, String(aOther.String)
+			, WString(aOther.WString)
+		{}
 
 		inline Instruction& operator=(const Instruction& aOther)
 		{
 			if (this == &aOther) { return *this; }
 
 			this->Operation = aOther.Operation;
+			this->Value = 0;
+			this->String = nullptr;
+			this->WString = nullptr;
 
 			switch (this->Operation)
 			{
@@ -343,100 +306,66 @@ namespace memtools
 	/// Offset:
 	/// 	Adds an offset (in bytes) to the current memory address.
 	///----------------------------------------------------------------------------------------------------
-	struct Offset : Instruction
-	{
-		inline Offset(int64_t aValue) : Instruction(EOperation::offset, aValue) {}
-	};
-
+	constexpr Instruction Offset(int64_t aValue) { return Instruction(EOperation::offset, aValue); }
 	///----------------------------------------------------------------------------------------------------
 	/// Follow:
 	/// 	Interprets the current address as a relative address and follows it.
 	///----------------------------------------------------------------------------------------------------
-	struct Follow : Instruction
-	{
-		inline Follow() : Instruction(EOperation::follow) {}
-	};
+	constexpr Instruction Follow() { return Instruction(EOperation::follow); }
 
 	///----------------------------------------------------------------------------------------------------
 	/// Strcmp:
 	/// 	Interprets the current address as a relative address to a string, follows and compares it.
 	///----------------------------------------------------------------------------------------------------
-	struct Strcmp : Instruction
-	{
-		inline Strcmp(std::string aStr) : Instruction(EOperation::strcmp, aStr) {}
-	};
+	constexpr Instruction Strcmp(const char* aStr) { return Instruction(EOperation::strcmp, aStr); }
 
 	///----------------------------------------------------------------------------------------------------
 	/// Wcscmp:
 	/// 	Interprets the current address as a relative address to a wstring, follows and compares it.
 	///----------------------------------------------------------------------------------------------------
-	struct Wcscmp : Instruction
-	{
-		inline Wcscmp(std::wstring aWStr) : Instruction(EOperation::wcscmp, aWStr) {}
-	};
+	constexpr Instruction Wcscmp(const wchar_t* aWStr) { return Instruction(EOperation::wcscmp, aWStr); }
 
 	///----------------------------------------------------------------------------------------------------
 	/// CmpI8:
 	/// 	Interprets the current address as an i8 compares it.
 	///----------------------------------------------------------------------------------------------------
-	struct CmpI8 : Instruction
-	{
-		inline CmpI8(int64_t aValue) : Instruction(EOperation::cmpi8, aValue) {}
-	};
+	constexpr Instruction CmpI8(int64_t aValue) { return Instruction(EOperation::cmpi8, aValue); }
 
 	///----------------------------------------------------------------------------------------------------
 	/// CmpI16:
 	/// 	Interprets the current address as an i16 compares it.
 	///----------------------------------------------------------------------------------------------------
-	struct CmpI16 : Instruction
-	{
-		inline CmpI16(int64_t aValue) : Instruction(EOperation::cmpi16, aValue) {}
-	};
+	constexpr Instruction CmpI16(int64_t aValue) { return Instruction(EOperation::cmpi16, aValue); }
 
 	///----------------------------------------------------------------------------------------------------
 	/// CmpI32:
 	/// 	Interprets the current address as an i32 compares it.
 	///----------------------------------------------------------------------------------------------------
-	struct CmpI32 : Instruction
-	{
-		inline CmpI32(int64_t aValue) : Instruction(EOperation::cmpi32, aValue) {}
-	};
+	constexpr Instruction CmpI32(int64_t aValue) { return Instruction(EOperation::cmpi32, aValue); }
 
 	///----------------------------------------------------------------------------------------------------
 	/// CmpI64:
 	/// 	Interprets the current address as an i64 compares it.
 	///----------------------------------------------------------------------------------------------------
-	struct CmpI64 : Instruction
-	{
-		inline CmpI64(int64_t aValue) : Instruction(EOperation::cmpi64, aValue) {}
-	};
+	constexpr Instruction CmpI64(int64_t aValue) { return Instruction(EOperation::cmpi64, aValue); }
 
 	///----------------------------------------------------------------------------------------------------
 	/// PushAddr:
 	/// 	Stores the current address on the address stack.
 	///----------------------------------------------------------------------------------------------------
-	struct PushAddr : Instruction
-	{
-		inline PushAddr() : Instruction(EOperation::pushaddr) {}
-	};
+	constexpr Instruction PushAddr() { return Instruction(EOperation::pushaddr); }
 
 	///----------------------------------------------------------------------------------------------------
 	/// PopAddr:
 	/// 	Restores the last address on the address stack and removes it.
 	///----------------------------------------------------------------------------------------------------
-	struct PopAddr : Instruction
-	{
-		inline PopAddr() : Instruction(EOperation::popaddr) {}
-	};
+	constexpr Instruction PopAddr() { return Instruction(EOperation::popaddr); }
 
 	///----------------------------------------------------------------------------------------------------
 	/// AdvWcard:
 	/// 	Adds an offset to the current offset, so that the address will be at the next set of wildcards.
 	///----------------------------------------------------------------------------------------------------
-	struct AdvWcard : Instruction
-	{
-		inline AdvWcard() : Instruction(EOperation::advwcard) {}
-	};
+	constexpr Instruction AdvWcard() { return Instruction(EOperation::advwcard); }
 
 	///----------------------------------------------------------------------------------------------------
 	/// DataScan Struct
@@ -580,12 +509,12 @@ namespace memtools
 								}
 								case EOperation::strcmp:
 								{
-									instructionsFailed += strcmp((const char*)FollowRelativeAddress(resultAddr), inst.String.c_str()) == 0 ? 0 : 1;
+									instructionsFailed += strcmp((const char*)FollowRelativeAddress(resultAddr), inst.String) == 0 ? 0 : 1;
 									break;
 								}
 								case EOperation::wcscmp:
 								{
-									instructionsFailed += wcscmp((const wchar_t*)FollowRelativeAddress(resultAddr), inst.WString.c_str()) == 0 ? 0 : 1;
+									instructionsFailed += wcscmp((const wchar_t*)FollowRelativeAddress(resultAddr), inst.WString) == 0 ? 0 : 1;
 									break;
 								}
 								case EOperation::cmpi8:
