@@ -15,7 +15,6 @@
 #include <cstdint>
 #include <initializer_list>
 #include <psapi.h>
-#include <string>
 #include <vector>
 
 /// You can define ENABLE_PATTERN_CACHING which will store the first result matching a given pattern.
@@ -373,7 +372,7 @@ namespace memtools
 	/// 	Adds an offset to the current offset, so that the address will be at the next set of wildcards.
 	/// 	Pass aSets for how many amount of sets should be skipped.
 	///----------------------------------------------------------------------------------------------------
-	constexpr Instruction AdvWcard(int64_t aSets = 1) { return Instruction(EOperation::advwcard, max(1, aSets)); }
+	constexpr Instruction AdvWcard(int64_t aSets = 1) { return Instruction(EOperation::advwcard, aSets > 1 ? aSets : 1); }
 
 	///----------------------------------------------------------------------------------------------------
 	/// PatternScan Struct
