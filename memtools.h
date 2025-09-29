@@ -371,8 +371,9 @@ namespace memtools
 	///----------------------------------------------------------------------------------------------------
 	/// AdvWcard:
 	/// 	Adds an offset to the current offset, so that the address will be at the next set of wildcards.
+	/// 	Pass aSets for how many amount of sets should be skipped.
 	///----------------------------------------------------------------------------------------------------
-	constexpr Instruction AdvWcard() { return Instruction(EOperation::advwcard); }
+	constexpr Instruction AdvWcard(int64_t aSets = 1) { return Instruction(EOperation::advwcard, max(1, aSets)); }
 
 	///----------------------------------------------------------------------------------------------------
 	/// PatternScan Struct
@@ -560,26 +561,31 @@ namespace memtools
 								}
 								case EOperation::advwcard:
 								{
-									bool wasAtWildcard = this->Assembly.Bytes[offsetFromMatch].IsWildcard;
-									bool foundWildcard = false;
-
-									while (offsetFromMatch < (int64_t)this->Assembly.Size)
+									/* Advance as many sets as in the parameter. */
+									for (int64_t i = 0; i < inst.Value; i++)
 									{
-										if (wasAtWildcard && this->Assembly.Bytes[offsetFromMatch].IsWildcard)
+										bool wasAtWildcard = this->Assembly.Bytes[offsetFromMatch].IsWildcard;
+										bool foundWildcard = false;
+
+										while (offsetFromMatch < (int64_t)this->Assembly.Size)
 										{
-											offsetFromMatch++;
-										}
-										else if (!wasAtWildcard && this->Assembly.Bytes[offsetFromMatch].IsWildcard)
-										{
-											resultAddr = base + i + offsetFromMatch;
-											break;
-										}
-										else
-										{
-											offsetFromMatch++;
-											wasAtWildcard = false;
+											if (wasAtWildcard && this->Assembly.Bytes[offsetFromMatch].IsWildcard)
+											{
+												offsetFromMatch++;
+											}
+											else if (!wasAtWildcard && this->Assembly.Bytes[offsetFromMatch].IsWildcard)
+											{
+												break;
+											}
+											else
+											{
+												offsetFromMatch++;
+												wasAtWildcard = false;
+											}
 										}
 									}
+
+									resultAddr = base + i + offsetFromMatch;
 
 									break;
 								}
