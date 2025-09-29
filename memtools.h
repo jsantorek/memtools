@@ -307,6 +307,7 @@ namespace memtools
 	/// 	Adds an offset (in bytes) to the current memory address.
 	///----------------------------------------------------------------------------------------------------
 	constexpr Instruction Offset(int64_t aValue) { return Instruction(EOperation::offset, aValue); }
+	
 	///----------------------------------------------------------------------------------------------------
 	/// Follow:
 	/// 	Interprets the current address as a relative address and follows it.
