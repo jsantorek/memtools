@@ -375,9 +375,9 @@ namespace memtools
 	constexpr Instruction AdvWcard() { return Instruction(EOperation::advwcard); }
 
 	///----------------------------------------------------------------------------------------------------
-	/// DataScan Struct
+	/// PatternScan Struct
 	///----------------------------------------------------------------------------------------------------
-	struct DataScan
+	struct PatternScan
 	{
 		Pattern                                         Assembly;
 		std::array<Instruction, MAX_INSTRUCTION_LENGTH> Instructions = {};
@@ -387,7 +387,7 @@ namespace memtools
 		/// ctor
 		///----------------------------------------------------------------------------------------------------
 		template<typename... Instrs>
-		constexpr DataScan(Pattern aASM, Instrs... instrs)
+		constexpr PatternScan(Pattern aASM, Instrs... instrs)
 			: Assembly(aASM)
 			, Instructions{ instrs... }
 			, Count(sizeof...(Instrs))
@@ -613,14 +613,14 @@ namespace memtools
 	///----------------------------------------------------------------------------------------------------
 	struct FallbackScan
 	{
-		std::vector<DataScan> Scans;
+		std::vector<PatternScan> Scans;
 
 		///----------------------------------------------------------------------------------------------------
 		/// ctor
 		///----------------------------------------------------------------------------------------------------
-		inline FallbackScan(std::initializer_list<DataScan> aScans)
+		inline FallbackScan(std::initializer_list<PatternScan> aScans)
 		{
-			for (const DataScan& scan : aScans)
+			for (const PatternScan& scan : aScans)
 			{
 				this->Scans.push_back(scan);
 			}
@@ -633,7 +633,7 @@ namespace memtools
 		template <typename T = void*>
 		inline T Scan() const
 		{
-			for (const DataScan& scan : this->Scans)
+			for (const PatternScan& scan : this->Scans)
 			{
 				void* result = scan.Scan();
 
