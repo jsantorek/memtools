@@ -275,7 +275,7 @@ namespace memtools
 			, WString(aOther.WString)
 		{}
 
-		inline Instruction& operator=(const Instruction& aOther)
+		constexpr inline Instruction& operator=(const Instruction& aOther)
 		{
 			if (this == &aOther) { return *this; }
 
@@ -392,7 +392,22 @@ namespace memtools
 			, Instructions{ instrs... }
 			, Count(sizeof...(Instrs))
 		{
-			static_assert(sizeof...(Instrs) <= MAX_INSTRUCTION_LENGTH, "Too many instructions for DataScan.");
+			static_assert(sizeof...(Instrs) <= MAX_INSTRUCTION_LENGTH, "Too many instructions for PatternScan.");
+		}
+
+		template<typename... Instrs>
+		constexpr PatternScan(PatternScan aScan, Instrs... instrs)
+			: Assembly(aScan.Assembly)
+			, Instructions(aScan.Instructions)
+			, Count(aScan.Count + sizeof...(Instrs))
+		{
+			std::size_t idx = aScan.Count;
+			for (const Instruction instr : {instrs...})
+			{
+				if (idx > MAX_INSTRUCTION_LENGTH)
+					throw "Too many instructions for PatternScan.";
+				Instructions[idx++] = instr;
+			}
 		}
 
 		///----------------------------------------------------------------------------------------------------
